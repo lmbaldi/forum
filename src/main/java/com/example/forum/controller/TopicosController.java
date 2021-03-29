@@ -15,6 +15,9 @@ import com.example.forum.repository.CursoRepository;
 import com.example.forum.repository.TopicoRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -38,21 +42,27 @@ public class TopicosController {
     private CursoRepository cursoRepository;
 
     @GetMapping
-    public List<TopicoDto> lista(String nomeCurso){
+    public Page<TopicoDto> lista(
+        @RequestParam(required = false) String nomeCurso, 
+        @RequestParam int pagina, 
+        @RequestParam int qtde) {
+
+        Pageable paginacao = PageRequest.of(pagina, qtde);
+            
         if(nomeCurso == null){
-            return listarTopicos();
+            return listarTopicos(paginacao);
         }else{
-            return listarCursoPorNome(nomeCurso);
+            return listarCursoPorNome(nomeCurso, paginacao);
         }
     }
 
-    private List<TopicoDto> listarCursoPorNome(String nomeCurso) {
-        List<Topico> topicos = topicoRepository.findByCursoNome(nomeCurso);
+    private Page<TopicoDto> listarCursoPorNome(String nomeCurso, Pageable paginacao) {
+        Page<Topico> topicos = topicoRepository.findByCursoNome(nomeCurso, paginacao);
         return TopicoDto.converter(topicos);
     }
 
-    private List<TopicoDto> listarTopicos() {
-        List<Topico> topicos = topicoRepository.findAll();
+    private Page<TopicoDto> listarTopicos(Pageable paginacao) {
+        Page<Topico> topicos = topicoRepository.findAll(paginacao);
         return TopicoDto.converter(topicos);
     }
 
