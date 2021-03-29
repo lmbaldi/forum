@@ -1,8 +1,6 @@
 package com.example.forum.controller.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.example.forum.modelo.Topico;
 

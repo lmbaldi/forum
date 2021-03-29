@@ -1,7 +1,5 @@
 package com.example.forum.repository;
 
-import java.util.List;
-
 import com.example.forum.modelo.Topico;
 
 import org.springframework.data.domain.Page;
