@@ -1,6 +1,7 @@
 package com.example.forum.controller;
 
 import com.example.forum.config.security.TokenService;
+import com.example.forum.controller.dto.TokenDto;
 import com.example.forum.controller.form.LogimForm;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +27,14 @@ public class AutenticacaoController {
     private TokenService tokenService;
     
     @PostMapping
-    public ResponseEntity<?> autenticar(@RequestBody @Validated LogimForm form){
+    public ResponseEntity<TokenDto> autenticar(@RequestBody @Validated LogimForm form){
 
         UsernamePasswordAuthenticationToken dadosLogin = form.converter();
 
         try {
             Authentication authenticate = authManager.authenticate(dadosLogin);
             String token = tokenService.gerarToken(authenticate);
-            System.out.println(token);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(new TokenDto(token, "Bearer"));
         } catch (AuthenticationException e) {
             return ResponseEntity.badRequest().build();
         }    
