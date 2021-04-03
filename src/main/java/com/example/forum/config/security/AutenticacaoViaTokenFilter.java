@@ -7,17 +7,28 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.example.forum.modelo.Usuario;
+import com.example.forum.repository.UsuarioRepository;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 
 public class AutenticacaoViaTokenFilter extends OncePerRequestFilter{
 
     private TokenService tokenService;
+    private UsuarioRepository repository;
+
 
     //usar construtor para injetar a dependencia
-    //porque nos filters nao tem como usar @Autowired do Spring
-    public AutenticacaoViaTokenFilter(TokenService tokenService) {
+    //Porque ela não é um bean gerenciado pelo Spring
+    public AutenticacaoViaTokenFilter(
+        TokenService tokenService,
+        UsuarioRepository repository
+        ) {
         this.tokenService = tokenService;
+        this.repository = repository;
     }
 
 
@@ -27,13 +38,23 @@ public class AutenticacaoViaTokenFilter extends OncePerRequestFilter{
         
         String token = recuperarToken(request);
         boolean valido = tokenService.isTokenValido(token);
-        System.out.println("valido ===>" + valido);
-
         
-        //filterChain.doFilter(arg0, arg1);
+        if(valido){
+            autenticarCliente(token);
+        }
+        
+        filterChain.doFilter(request, response);
         
     }
 
+    private void autenticarCliente(String token) {
+        Long idUsuario= tokenService.getIdUsuario(token);
+        Usuario usuario = repository.findById(idUsuario).get();
+        UsernamePasswordAuthenticationToken authentication = 
+            new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+ 
     private String recuperarToken(HttpServletRequest request) {
 
         String token = request.getHeader("Authorization");

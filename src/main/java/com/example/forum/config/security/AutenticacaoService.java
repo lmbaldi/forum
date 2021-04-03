@@ -3,7 +3,7 @@ package com.example.forum.config.security;
 import java.util.Optional;
 
 import com.example.forum.modelo.Usuario;
-import com.example.forum.repository.UsuarioReposity;
+import com.example.forum.repository.UsuarioRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class AutenticacaoService  implements UserDetailsService {
 
     @Autowired
-    private UsuarioReposity repository;
+    private UsuarioRepository repository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
